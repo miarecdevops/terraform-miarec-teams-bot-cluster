@@ -10,7 +10,7 @@ resource "random_password" "vm_admin_password" {
 # Create public IPs
 resource "azurerm_public_ip" "bots" {
     count               = var.vm_count
-    name                = "${var.environment}-public-ip-${count.index}"
+    name                = "${var.environment}-public-ip-${count.index+1}"
     resource_group_name = var.azure_resource_group
     location            = var.azure_region
     allocation_method   = var.public_ip_allocation_strategy
@@ -58,12 +58,12 @@ resource "azurerm_network_security_group" "bots" {
 # Create network interface
 resource "azurerm_network_interface" "bots" {
     count               = var.vm_count
-    name                = "${var.environment}-nic-${count.index}"
+    name                = "${var.environment}-nic-${count.index+1}"
     resource_group_name = var.azure_resource_group
     location            = var.azure_region
 
     ip_configuration {
-        name                          = "${var.environment}-ip-${count.index}"
+        name                          = "${var.environment}-ip-${count.index+1}"
         subnet_id                     = azurerm_subnet.bots.id
         private_ip_address_allocation = var.private_ip_allocation_strategy
         public_ip_address_id          = azurerm_public_ip.bots[count.index].id
@@ -107,7 +107,8 @@ resource "azurerm_storage_account" "diag_storage_accounts" {
 // ----------------------------------------------------------------------------
 resource "azurerm_windows_virtual_machine" "bots" {
     count               = var.vm_count
-    name                = "${var.environment}-${count.index}"
+    name                = "${var.vm_computer_name_prefix}${format("%02s", count.index+1)}"
+    computer_name       = "${var.vm_computer_name_prefix}${format("%02s", count.index+1)}"
     resource_group_name = var.azure_resource_group
     location            = var.azure_region
     size                = var.vm_instance_type
@@ -136,8 +137,12 @@ resource "azurerm_windows_virtual_machine" "bots" {
         storage_account_uri = azurerm_storage_account.diag_storage_accounts[count.index].primary_blob_endpoint
     }
 
+    identity {
+        type = "SystemAssigned, UserAssigned"
+        identity_ids = [azurerm_user_assigned_identity.app_config_access.id]
+    }
+
     tags = {
-        Name        = "${var.environment}-bot-${count.index}"
         Environment = var.environment
     }
 }

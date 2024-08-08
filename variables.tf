@@ -15,6 +15,23 @@ variable "azure_resource_group" {
   description = "Existing Resource Group, where all the resources will be provisioned"
 }
 
+variable "azure_app_config_name" {
+  type        = string
+  description = "Name of the App Configuration endpoint (will be created)"
+}
+
+variable "azure_key_vault_name" {
+  type        = string
+  description = "Name of the Key Vault (will be created)"
+}
+
+
+variable "vm_computer_name_prefix" {
+  type = string
+  description = "A prefix for generated computer names for VMs. The suffix is an instance index, like (1, 2). Note comupters names can be most 15 characters"
+  default = "bot"
+}
+
 
 variable "vm_admin_user" {
   type        = string
