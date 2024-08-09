@@ -68,71 +68,10 @@ Expand-Archive -path "${install_dir}/MiaRec.TeamsBot.zip" -destinationpath "${in
 
 # -------------------------------------
 # Install Windows Service and start it
+# Using our Service wrapper application because it is more robust.
+# It will automatically restart the failed application and will keep trying indefinitely.
+# Windows Service manager doesn't re-try to start the application if it failed the first time.
 # -------------------------------------
-$serviceName = "MiaRec.TeamsBot"
-New-Service -Name $serviceName -BinaryPathName "${install_dir}/MiaRec.TeamsBot/MiaRec.TeamsBot.exe" -StartupType Automatic
-
-# Enable automatic restart on failure
-& "sc.exe" failure $serviceName actions= restart/180000/restart/180000/reboot/180000 reset= 86400
-
-# Increases start timeout to 5 minutes
-# When VM is just created, it may be too busy doing other tasks (Windows Update, etc.)
-# Our .NET application takes longer to start than normally
-# Unfortunately, Windows doesn't attempt to start the service again if it failed during start.
-Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name ServicesPipeTimeout -Value 60000 -Type DWord
-
-
-# The following function will make a few attempts to start the service
-function Start-ServiceWithRetry {
-    param(
-        [string]$serviceName,
-        [int]$maxAttempts,
-        [int]$delayBetweenAttempts,
-        [int]$statusCheckTimeout
-    )
-
-    $attempt = 0
-    
-    while ($attempt -lt $maxAttempts) {
-        $attempt++
-        Write-Host "Attempt $attempt : Starting service '$serviceName'..."
-        
-        try {
-            # Start the service
-            Start-Service -Name $serviceName -ErrorAction Stop
-            
-            # Check service status with timeout
-            $service = Get-Service -Name $serviceName
-            $timeElapsed = 0
-            while ($service.Status -ne 'Running' -and $timeElapsed -lt $statusCheckTimeout) {
-                Write-Host "Service '$serviceName' status: $($service.Status). Waiting for it to start..."
-                Start-Sleep -Seconds 2
-                $service.Refresh()
-                $timeElapsed += 2
-            }
-
-            if ($service.Status -eq 'Running') {
-                Write-Host "Service '$serviceName' started successfully."
-                return
-            } else {
-                Write-Host "Service '$serviceName' failed to start within the timeout period."
-                throw "Service startup timed out."
-            }
-        } catch {
-            Write-Host "Attempt $attempt : Failed to start service '$serviceName'. Error: $_"
-        }
-        
-        if ($attempt -lt $maxAttempts) {
-            Write-Host "Retrying in $delayBetweenAttempts seconds..."
-            Start-Sleep -Seconds $delayBetweenAttempts
-        } else {
-            Write-Host "Max attempts reached. Service '$serviceName' could not be started."
-        }
-    }
-}
-
-Start-ServiceWithRetry -serviceName $serviceName -maxAttempts 10 -delayBetweenAttempts 5 -statusCheckTimeout 70
-
-
-
+& "${install_dir}/MiaRec.TeamsBot/MiaRec.TeamsBotService.exe" -i
+& "${install_dir}/MiaRec.TeamsBot/MiaRec.TeamsBotService.exe" -r
 
