@@ -1,1 +1,35 @@
+environment = "miarec"
+
+# Resource Group must be pre-created
 azure_rource_group = "MyResourceGroup"
+
+# Base DNS zone (should be provisioned in Azure DNS in the same Resource Group)
+dns_zone           = "teams.example.com"
+
+# The shared DNS name that points to Load Balancer
+dns_shared_address = "bots.teams.example.com"
+
+# Key Vault and App Config resource, which will be provisiooned
+# These names must be globally unique
+azure_key_vault_name  = "MiaRecTeamVault"
+azure_app_config_name = "MiaRecTeamAppConfig"
+
+traefik_download_url = "https://download.example.com/files/Traefik.zip"
+bot_download_url     = "https://download.example.com/files/MiaRec.TeamsBot.zip"
+crt_download_url     = "https://download.example.com/files/VC_redist.x64.exe"
+
+vm_computer_names = [
+  "bot01",
+  "bot02",
+]
+
+# Address of MiaRec server (to use DNS-SRV lookup, set siprec_port to 0)
+siprec_host = "miarec.example.com"
+siprec_port = 0
+siprec_protocol = "udp"
+
+
+vm_admin_user = "botadmin"
+
+# Let's Encrypt settings
+letsencrypt_email = "ssl@example.com"
