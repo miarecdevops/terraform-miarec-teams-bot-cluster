@@ -1,0 +1,17 @@
+
+# -------------------------------------
+# Download files
+# -------------------------------------
+(New-Object System.Net.WebClient).DownloadFile("${traefik_download_url}", "${install_dir}/Traefik.zip")
+
+# -------------------------------------
+# Extract *.zip files
+# -------------------------------------
+Expand-Archive -path "${install_dir}/Traefik.zip" -destinationpath "${install_dir}"
+
+& "${install_dir}/Traefik/TraefikService.exe -i"
+
+& "${install_dir}/Traefik/TraefikService.exe -r"
+
+
+

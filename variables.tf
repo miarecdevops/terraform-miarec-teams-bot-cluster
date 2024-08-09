@@ -25,6 +25,22 @@ variable "azure_key_vault_name" {
   description = "Name of the Key Vault (will be created)"
 }
 
+variable "traefik_download_url" {
+  type = string
+  description = "URL to download Traefik package"
+}
+
+variable "bot_download_url" {
+  type = string
+  description = "URL to download MiaRec Bot package"
+}
+
+variable "install_dir" {
+  type = string
+  description = "Location of where the applications will be installed"
+  default = "C:/Progs/"
+}
+
 
 variable "vm_computer_name_prefix" {
   type = string
