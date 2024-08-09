@@ -12,7 +12,7 @@ resource "azurerm_user_assigned_identity" "app_config_access" {
 }
 
 resource "azurerm_role_assignment" "app_config_data_reader" {
-   scope                = azurerm_app_configuration.app_config.id
-   role_definition_name = "App Configuration Data Reader"
-   principal_id         = azurerm_user_assigned_identity.app_config_access.principal_id
+  scope                = azurerm_app_configuration.app_config.id
+  role_definition_name = "App Configuration Data Reader"
+  principal_id         = azurerm_user_assigned_identity.app_config_access.principal_id
 }

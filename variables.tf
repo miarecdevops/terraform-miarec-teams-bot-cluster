@@ -26,26 +26,35 @@ variable "azure_key_vault_name" {
 }
 
 variable "traefik_download_url" {
-  type = string
+  type        = string
   description = "URL to download Traefik package"
 }
 
 variable "bot_download_url" {
-  type = string
+  type        = string
   description = "URL to download MiaRec Bot package"
 }
 
 variable "install_dir" {
-  type = string
+  type        = string
   description = "Location of where the applications will be installed"
-  default = "C:/Progs/"
+  default     = "C:/Progs"
+}
+
+variable "vm_computer_names" {
+  type        = list(string)
+  description = "Computer names of each of provisioned machines. The names will be part of DNS name as well"
 }
 
 
-variable "vm_computer_name_prefix" {
-  type = string
-  description = "A prefix for generated computer names for VMs. The suffix is an instance index, like (1, 2). Note comupters names can be most 15 characters"
-  default = "bot"
+variable "dns_zone" {
+  type        = string
+  description = "DNS zone to use. For each VM, we create A record, which is formed from Computer Name and DNS zone"
+}
+
+variable "dns_global_address" {
+  type        = string
+  description = "An address by which this cluster will be reached. This record should be configured to point to Load Balancer"
 }
 
 
@@ -55,17 +64,6 @@ variable "vm_admin_user" {
   default     = "botadmin"
 }
 
-variable "vm_admin_password" {
-  type        = string
-  description = "Password for admin user. If not provided, a password will be randomly generated."
-  default     = null
-}
-
-variable "vm_count" {
-  type        = number
-  description = "A number of VMs in a cluster"
-  default     = 1
-}
 
 variable "vm_instance_type" {
   type        = string
@@ -95,26 +93,26 @@ variable "vm_disk_storage_caching" {
 variable "vm_security_rules" {
   default = [
     {
-        name                       = "http"
-        priority                   = 100
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "80"
-        source_address_prefix      = "*"
-        destination_address_prefix = "*"
+      name                       = "http"
+      priority                   = 100
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "80"
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
     },
     {
-        name                       = "https"
-        priority                   = 101
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "443"
-        source_address_prefix      = "*"
-        destination_address_prefix = "*"
+      name                       = "https"
+      priority                   = 101
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "443"
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
     }
   ]
   description = "Rules that will be used to allow or deny inbound/outbound traffic from/to Azure Resource"

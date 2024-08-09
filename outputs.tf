@@ -5,6 +5,6 @@
 
 output "admin_password" {
   description = "VM admin password"
-  value     = random_password.vm_admin_password.result
-  sensitive = true
+  value       = random_password.vm_admin_password.result
+  sensitive   = true
 }
