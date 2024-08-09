@@ -70,11 +70,14 @@ Expand-Archive -path "${install_dir}/MiaRec.TeamsBot.zip" -destinationpath "${in
 # Install Windows Service and start it
 # -------------------------------------
 New-Service -Name "MiaRec.TeamsBot" -BinaryPathName "${install_dir}/MiaRec.TeamsBot/MiaRec.TeamsBot.exe" -StartupType Automatic
-Start-Service -Name "MiaRec.TeamsBot"
-
 
 # Enable automatic restart on failure
 & "sc.exe" failure "MiaRec.TeamsBot" actions= restart/180000/restart/180000/reboot/180000 reset= 86400
+
+# On first start, it can take too long to prepare .NET 
+# And service may not be able to start within the allocated time (30s)
+# Windows will mark the service as failed
+Start-Service -Name "MiaRec.TeamsBot"
 
 
 
