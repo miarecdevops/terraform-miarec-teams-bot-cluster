@@ -165,3 +165,10 @@ resource "azurerm_role_assignment" "app_config_access" {
   role_definition_name = "App Configuration Data Reader"
   principal_id         = data.azurerm_virtual_machine.vm[each.key].identity[0].principal_id
 }
+
+resource "azurerm_role_assignment" "dns_zone_access" {
+  for_each            = toset(var.vm_computer_names)
+  scope                = data.azurerm_dns_zone.dns_zone.id
+  role_definition_name = "DNS Zone Contributor"
+  principal_id         = data.azurerm_virtual_machine.vm[each.key].identity[0].principal_id
+}

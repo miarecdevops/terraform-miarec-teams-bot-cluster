@@ -8,6 +8,7 @@
 
 # Traefik settings
 [System.Environment]::SetEnvironmentVariable('BOT_FQDN', '${bot_fqdn}', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('BOT_SHARED_FQDN', '${bot_shared_fqdn}', [System.EnvironmentVariableTarget]::Machine)
 # [System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT', 'true', [System.EnvironmentVariableTarget]::Machine)
 # [System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL', '${letsencrypt_email}', [System.EnvironmentVariableTarget]::Machine)
 # [System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_DNSCHALLENGE', 'true', [System.EnvironmentVariableTarget]::Machine)

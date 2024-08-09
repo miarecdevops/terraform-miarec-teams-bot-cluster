@@ -64,6 +64,12 @@ variable "dns_zone" {
   description = "DNS zone to use. For each VM, we create A record, which is formed from Computer Name and DNS zone"
 }
 
+variable "dns_shared_address" {
+  type        = string
+  description = "DNS for a whole cluster, which must be pointed to Load Balancer"
+}
+
+
 
 variable "vm_admin_user" {
   type        = string

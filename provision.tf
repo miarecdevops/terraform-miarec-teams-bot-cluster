@@ -11,6 +11,7 @@ data "template_file" "install_script" {
     azure_resource_group = var.azure_resource_group
 
     bot_fqdn             = "${each.key}.${var.dns_zone}"
+    bot_shared_fqdn      = var.dns_shared_address
 
     letsencrypt_email    = var.letsencrypt_email
 
