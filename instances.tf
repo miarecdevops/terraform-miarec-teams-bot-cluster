@@ -135,15 +135,33 @@ resource "azurerm_windows_virtual_machine" "vm" {
   }
 
   identity {
-    type = "SystemAssigned, UserAssigned"
-    identity_ids = [
-      azurerm_user_assigned_identity.app_config_access.id,
-      azurerm_user_assigned_identity.key_vault_access.id,
-      azurerm_user_assigned_identity.dns_zone_access.id
-    ]
+    type = "SystemAssigned"
   }
 
   tags = {
     Environment = var.environment
   }
+}
+
+
+# Read information for the provisioned VM
+# This will allow us to access System-generated Identity
+data "azurerm_virtual_machine" "vm" {
+  for_each            = toset(var.vm_computer_names)
+  name                = azurerm_windows_virtual_machine.vm[each.key].name
+  resource_group_name = var.azure_resource_group
+}
+
+resource "azurerm_role_assignment" "key_vault_access" {
+  for_each            = toset(var.vm_computer_names)
+  scope                = azurerm_key_vault.vault.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = data.azurerm_virtual_machine.vm[each.key].identities[0].principal_id
+}
+
+resource "azurerm_role_assignment" "app_config_access" {
+  for_each            = toset(var.vm_computer_names)
+  scope                = azurerm_app_configuration.app_config.id
+  role_definition_name = "App Configuration Data Reader"
+  principal_id         = data.azurerm_virtual_machine.vm[each.key].identities[0].principal_id
 }

@@ -35,6 +35,12 @@ variable "bot_download_url" {
   description = "URL to download MiaRec Bot package"
 }
 
+variable "crt_download_url" {
+  type        = string
+  description = "URL to download Visual C++ Redistributable package"
+}
+
+
 variable "install_dir" {
   type        = string
   description = "Location of where the applications will be installed"
@@ -56,11 +62,6 @@ variable "letsencrypt_email" {
 variable "dns_zone" {
   type        = string
   description = "DNS zone to use. For each VM, we create A record, which is formed from Computer Name and DNS zone"
-}
-
-variable "dns_shared_fqdn" {
-  type        = string
-  description = "An address by which this cluster will be reached. This record should be configured to point to Load Balancer"
 }
 
 

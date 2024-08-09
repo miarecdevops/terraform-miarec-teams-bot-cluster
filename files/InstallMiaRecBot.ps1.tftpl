@@ -8,11 +8,10 @@
 
 # Traefik settings
 [System.Environment]::SetEnvironmentVariable('BOT_FQDN', '${bot_fqdn}', [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('BOT_SHARED_FQDN', '${bot_shared_fqdn}', [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT', 'true', [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL', '${letsencrypt_email}', [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_DNSCHALLENGE', 'true', [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_DNSCHALLENGE_PROVIDER', 'azuredns', [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT', 'true', [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL', '${letsencrypt_email}', [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_DNSCHALLENGE', 'true', [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_DNSCHALLENGE_PROVIDER', 'azuredns', [System.EnvironmentVariableTarget]::Machine)
 
 # Bot settings
 [System.Environment]::SetEnvironmentVariable('AppSettings__ServiceDnsName', '${bot_fqdn}', [System.EnvironmentVariableTarget]::Machine)
@@ -20,6 +19,12 @@
 
 [System.Environment]::SetEnvironmentVariable('AzureKeyVaultName', '${key_valut_name}', [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AzureAppConfigEndpoint', '${app_config_endpoint}', [System.EnvironmentVariableTarget]::Machine)
+
+# -------------------------------------
+# Configure firewall
+# -------------------------------------
+New-NetFirewallRule -DisplayName 'HTTP' -Profile 'Public' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 80
+New-NetFirewallRule -DisplayName 'HTTPS' -Profile 'Public' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 443
 
 
 # -------------------------------------
@@ -42,6 +47,12 @@ Expand-Archive -path "${install_dir}/Traefik.zip" -destinationpath "${install_di
 # -------------------------------------
 & "${install_dir}/Traefik/TraefikService.exe" -i
 & "${install_dir}/Traefik/TraefikService.exe" -r
+
+# -------------------------------------
+# Download Visual C++ Redistributable
+# -------------------------------------
+Invoke-WebRequest -UseBasicParsing -Uri "${crt_download_url}" -OutFile "${install_dir}/VC_redist.x64.exe"
+& "${install_dir}/VC_redist.x64.exe" /quiet /norestart
 
 # -------------------------------------
 # Download MiaRec Bot

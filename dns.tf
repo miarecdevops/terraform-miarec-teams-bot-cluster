@@ -13,6 +13,7 @@ resource "azurerm_dns_a_record" "a_record" {
   target_resource_id  = azurerm_public_ip.ip[each.key].id
 }
 
+/*
 # Identity for VMs to issue DNS Challenge requests for LetsEncrypt
 resource "azurerm_user_assigned_identity" "dns_zone_access" {
   name                = "${var.environment}-dns-zone-access"
@@ -32,3 +33,4 @@ resource "azurerm_role_assignment" "dns_zone_contributor" {
   role_definition_name = "DNS Zone Contributor"
   principal_id         = azurerm_user_assigned_identity.dns_zone_access.principal_id
 }
+*/
