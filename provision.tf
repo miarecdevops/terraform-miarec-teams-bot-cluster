@@ -4,6 +4,7 @@ data "template_file" "install_script" {
   vars = {
     traefik_download_url = var.traefik_download_url
     bot_download_url     = var.bot_download_url
+    crt_download_url     = var.crt_download_url
     install_dir          = var.install_dir
 
     azure_tenant_id      = data.azurerm_client_config.current.tenant_id

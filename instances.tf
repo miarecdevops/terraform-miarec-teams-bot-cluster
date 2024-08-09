@@ -156,12 +156,12 @@ resource "azurerm_role_assignment" "key_vault_access" {
   for_each            = toset(var.vm_computer_names)
   scope                = azurerm_key_vault.vault.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = data.azurerm_virtual_machine.vm[each.key].identities[0].principal_id
+  principal_id         = data.azurerm_virtual_machine.vm[each.key].identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "app_config_access" {
   for_each            = toset(var.vm_computer_names)
   scope                = azurerm_app_configuration.app_config.id
   role_definition_name = "App Configuration Data Reader"
-  principal_id         = data.azurerm_virtual_machine.vm[each.key].identities[0].principal_id
+  principal_id         = data.azurerm_virtual_machine.vm[each.key].identity[0].principal_id
 }
