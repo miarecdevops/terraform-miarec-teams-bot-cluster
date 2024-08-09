@@ -72,4 +72,8 @@ New-Service -Name "MiaRec.TeamsBot" -BinaryPathName "${install_dir}/MiaRec.Teams
 Start-Service -Name "MiaRec.TeamsBot"
 
 
+# Enable automatic restart on failure
+& "sc.exe" failure "MiaRec.TeamsBot" actions= restart/180000/restart/180000/reboot/180000 reset= 86400
+
+
 
