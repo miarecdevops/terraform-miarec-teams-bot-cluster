@@ -14,6 +14,7 @@ resource "azurerm_public_ip" "ip" {
   resource_group_name = var.azure_resource_group
   location            = var.azure_region
   allocation_method   = var.public_ip_allocation_strategy
+  sku                 = "Standard"
 
   tags = {
     Environment = var.environment
