@@ -47,12 +47,18 @@ variable "vm_computer_names" {
 }
 
 
+variable "letsencrypt_email" {
+  type = string
+  description = "Email address registered with LetsEncrypt"
+}
+
+
 variable "dns_zone" {
   type        = string
   description = "DNS zone to use. For each VM, we create A record, which is formed from Computer Name and DNS zone"
 }
 
-variable "dns_global_address" {
+variable "dns_shared_fqdn" {
   type        = string
   description = "An address by which this cluster will be reached. This record should be configured to point to Load Balancer"
 }
@@ -62,6 +68,23 @@ variable "vm_admin_user" {
   type        = string
   description = "Username that will be set for provisioned instances."
   default     = "botadmin"
+}
+
+variable "siprec_host" {
+  type = string
+  description = "SIPREC Host. Can be DNS or IP-address"
+}
+
+variable "siprec_port" {
+  type = number
+  description = "SIPREC port. Use 0 to activate DNS SRV lookup"
+  default = 0
+}
+
+variable "siprec_protocol" {
+  type = string
+  description = "SIPREC protocol ('udp' or 'tcp')"
+  default = "udp"
 }
 
 

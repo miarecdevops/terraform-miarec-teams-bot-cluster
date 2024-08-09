@@ -1,8 +1,35 @@
+# -------------------------------------
+# Set System Environment variables
+# -------------------------------------
+
+# Below variables are necessary for Traefik to issue SSL certificates using DNS-Challenge
+[System.Environment]::SetEnvironmentVariable('AZURE_TENANT_ID', '${azure_tenant_id}', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZURE_RESOURCE_GROUP', '${azure_resource_group}', [System.EnvironmentVariableTarget]::Machine)
+
+# Traefik settings
+[System.Environment]::SetEnvironmentVariable('BOT_FQDN', '${bot_fqdn}', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('BOT_SHARED_FQDN', '${bot_shared_fqdn}', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT', 'true', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL', '${letsencrypt_email}', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_DNSCHALLENGE', 'true', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_DNSCHALLENGE_PROVIDER', 'azuredns', [System.EnvironmentVariableTarget]::Machine)
+
+# Bot settings
+[System.Environment]::SetEnvironmentVariable('AppSettings__ServiceDnsName', '${bot_fqdn}', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AppSettings__MediaDnsName', '${bot_fqdn}', [System.EnvironmentVariableTarget]::Machine)
+
+[System.Environment]::SetEnvironmentVariable('AzureKeyVaultName', '${key_valut_name}', [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AzureAppConfigEndpoint', '${app_config_endpoint}', [System.EnvironmentVariableTarget]::Machine)
+
 
 # -------------------------------------
-# Download files
+# Create the installation directory if doesn't exist
 # -------------------------------------
 New-Item -ItemType Directory -Force -Path "${install_dir}"
+
+# -------------------------------------
+# Download Traefik
+# -------------------------------------
 Invoke-WebRequest -UseBasicParsing -Uri "${traefik_download_url}" -OutFile "${install_dir}/Traefik.zip"
 
 # -------------------------------------
@@ -10,8 +37,28 @@ Invoke-WebRequest -UseBasicParsing -Uri "${traefik_download_url}" -OutFile "${in
 # -------------------------------------
 Expand-Archive -path "${install_dir}/Traefik.zip" -destinationpath "${install_dir}"
 
+# -------------------------------------
+# Install Windows Service
+# -------------------------------------
 & "${install_dir}/Traefik/TraefikService.exe" -i
 & "${install_dir}/Traefik/TraefikService.exe" -r
+
+# -------------------------------------
+# Download MiaRec Bot
+# -------------------------------------
+Invoke-WebRequest -UseBasicParsing -Uri "${bot_download_url}" -OutFile "${install_dir}/MiaRec.TeamsBot.zip"
+
+# -------------------------------------
+# Extract *.zip files
+# -------------------------------------
+Expand-Archive -path "${install_dir}/MiaRec.TeamsBot.zip" -destinationpath "${install_dir}"
+
+
+# -------------------------------------
+# Install Windows Service and start it
+# -------------------------------------
+New-Service -Name "MiaRec.TeamsBot" -BinaryPathName "${install_dir}/MiaRec.TeamsBot/MiaRec.TeamsBot.exe" -StartupType Automatic
+Start-Service -Name "MiaRec.TeamsBot"
 
 
 

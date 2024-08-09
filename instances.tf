@@ -139,6 +139,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
     identity_ids = [
       azurerm_user_assigned_identity.app_config_access.id,
       azurerm_user_assigned_identity.key_vault_access.id,
+      azurerm_user_assigned_identity.dns_zone_access.id
     ]
   }
 
