@@ -1,7 +1,7 @@
 environment = "miarec"
 
 # Resource Group must be pre-created
-azure_rource_group = "MyResourceGroup"
+azure_resource_group = "MyResourceGroup"
 
 # Base DNS zone (should be provisioned in Azure DNS in the same Resource Group)
 dns_zone           = "teams.example.com"

@@ -80,19 +80,126 @@ As a result of this run, the following resoruces will be provisioned:
 ## Step 5. Post-setup manual provisioning
 
 
+In the previous steps, Terraform created **Azure Key Vault** and **Azure App Configuration** resources.
+
+The Key Vault will be used to store safely application credentials.
+
+The App Configuration will be used to store configuration of the application.
+
+
+In Azure web portal, open the Resource Group and locate the Key Valut that was created automatically on the previous steps.
+
+In the left pane, select **Object > Secret**. Click **+ Generate/Import** button to create new secrents.
+
+If you see the warning message that you have no permission to list or create secrets, then first navigate in the left pane to
+**Access control (IAM)**, click **Add > Add role assignment** button. 
+In the **Role** tab, select **Key Vault Administrator** under **Job function roles**. Click **Next**.
+In the **Members** tab, select **Assign access to User, group, or service principal**. 
+Select your account under **Members** list. Click **Review and Create**.
+
+Now, you should be able to create secrets now.
+
+Create the following secrets in Key Vault:
+
+- `ApplicationInsights--ConnectionString`
+- `AppSettings--AadAppSecret`
+- `AppSettings--AadAppId`
+
+
+In **Azure App Configuration** service, navigate to **Operations > Configuration explorer**.
+
+Create the following Key/Values:
+
+- `AppSettings:SipRecHost`
+- `AppSettings:SipRecPort`
+- `AppSettings:SipRecProtocol`
+
+
+
+
 ## Step 6. Second run - Automatic provisioning with Terrafom
 
+This time, provide a non-empty list of virtual machines in `terraform.tfvars` file:
+
+```
+vm_computer_names = ['bot01', 'bot02', 'bot03']
+```
+
+Run `terraform apply` command to provision instances.
+
+After successfull run, you should have the bot cluster up and running, ready to handle recording.
+
+## Step 7. Create Bastion host
+
+Bastion host is used for secure access to Windows servers via RDP protocol.
+
+Azure provides managed service **Bastion**, which will provision a dedicated instance inside the virtual netowrk,
+so you can securily access the servers RDP interface via web browser without exposing RDP port to public.
+
+In the Azure portal, locate one of the provisioned instances, select **Connect > Bastion** in the left pane and 
+click **Create Bastion** button.
+
+To access the instances, you need to know the admin username and password.
+
+The username is configured in `terraform.tfvars` file as parameter `vm_admin_user`.
+
+The password is randomly generated during terraform run. Run the following command to see the password:
+
+```bash
+terraform output admin_password
+```
+
+This will print the password to console enclosed in double quotes. Note, the double quotes are not part of the password.
 
 ## Step 7. Verification
 
 
 ## Troubleshooting
 
+Short check-list:
 
-### Logs
+- Verify if you can access individual bot web interface by opening in browser `https://botXX.example.com/ping`
+- Verify if you can access bots cluster via shared address (i.e. via load balancer) by opening in browser `https://bots.example.com/ping`
+- Make test calls
+- Check logs (see the next section)
+- Login to servers via Bastion and see if services **Traefik** and **MiaRec.TeamsBot** are running.
+- If `MiaRec.TeamsBot.exe` process is not running on the machine. Try to run it manually by opening `cmd.exe` console, navigating to `C:/Progs/MiaRec.TeamsBot/` directory and running the EXE file. Check any errors printed to console.
 
-### Metric
+## Logs
 
-### Login to instances
+### Centralized logging to Application Insights
+
+The application pushes logs to **Application Insights** service, where they can be reviewed in web browser.
+
+In Azure portal, navigate to the **Application Insights** resource, then select **Monitoring > Logs**, query table **traces**.
+
+### Local logs on virtual machines
+
+Login to the server(s) via Bastion and check the following locations for logs:
+
+- Event Viewer (Operating system logs)
+- Traefik log file `C:/Progs/Traefik/traefik.log`
+- MiaRec.TeamsBot log files(s) at `C:/Progs/MiaRec.TeamsBot/logs`. Note, these same log records should be accessible via centralized logging service (**Application Insights**, table `trace`). If a connection to the Application Insights doesn't work, you can check the local copy of logs. Such logs are retained for 30 days
 
 
+## Metrics
+
+Some application metrics are pushed to **Application Insights** service and can be reviewed there.
+
+## How to login to the instance(s)?
+
+Use the Bastion host, that was provisioned as part of setup.
+
+The OS username was configured in `terraform.tfvars` file as a parameter `vm_admin_user`.
+
+The OS password is randomly generated during terraform run. Run the following command to see the password:
+
+```bash
+terraform output admin_password
+```
+
+This will print the password to console enclosed in double quotes. Note, the double quotes are not part of the password.
+
+## How to update the application?
+
+TBD
